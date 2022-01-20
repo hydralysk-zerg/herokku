@@ -1,16 +1,24 @@
 const express = require('express');
 const path = require('path');
 const app = express();
+const mongoose = require('mongoose');
 const exphbs = require('express-handlebars');
 const homeRoutes = require('./routes/home');
 const cardRoutes = require('./routes/card');
 const addRoutes = require('./routes/add');
 const coursesRoutes = require('./routes/courses');
 
+const Handlebars = require('handlebars');
+const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
+
 const hbs = exphbs.create({
     defaultLayout: 'main',
-    extname: 'hbs'
+    extname: 'hbs',
+    handlebars: allowInsecurePrototypeAccess(Handlebars)
 });
+
+// const login = 'hydralisk';
+const password = 'tVBp4g8Cc8j!stJ';
 
 app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
@@ -25,6 +33,17 @@ app.use('/card', cardRoutes);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+async function start() {
+    try {
+        let url = `mongodb+srv://hydralisk:${password}@cluster0.plklm.mongodb.net/shop`;
+        await mongoose.connect(url, {
+            useNewUrlParser: true,
+        });
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+start();
